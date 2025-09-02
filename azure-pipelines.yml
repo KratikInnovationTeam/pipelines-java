@@ -1,11 +1,14 @@
-trigger:
+\trigger:
 - main
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
-- task: Maven@3
+- script: echo "Agent is ready on $(Agent.OS)"
+  displayName: 'Check agent readiness'
+
+- task: Maven@4
   inputs:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m'
@@ -16,13 +19,11 @@ steps:
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
 
-# 👇 Debug step: list what's inside target folder
 - script: |
     echo "Listing target folder contents:"
     ls -R $(System.DefaultWorkingDirectory)/target || echo "No target folder found"
   displayName: 'Check target folder'
 
-# 👇 Try publishing jar as artifact
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(System.DefaultWorkingDirectory)/target/*.jar'
