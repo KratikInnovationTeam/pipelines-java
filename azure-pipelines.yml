@@ -5,10 +5,8 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo "Agent is ready on $(Agent.OS)"
-  displayName: 'Check agent readiness'
-
-- task: Maven@4
+# 👇 Step 1: Build with Maven
+- task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m'
@@ -19,12 +17,15 @@ steps:
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
 
+# 👇 Step 2: Debug — check what was built
 - script: |
     echo "Listing target folder contents:"
     ls -R $(System.DefaultWorkingDirectory)/target || echo "No target folder found"
   displayName: 'Check target folder'
 
+# 👇 Step 3: Publish the WAR file as an artifact
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(System.DefaultWorkingDirectory)/target/*.jar'
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/target/helloworld.war'
     ArtifactName: 'drop'
+    publishLocation: 'Container'
