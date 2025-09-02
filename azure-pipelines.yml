@@ -16,6 +16,13 @@ steps:
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
     goals: 'package'
 
+# 👇 Debug step: list what's inside target folder
+- script: |
+    echo "Listing target folder contents:"
+    ls -R $(System.DefaultWorkingDirectory)/target || echo "No target folder found"
+  displayName: 'Check target folder'
+
+# 👇 Try publishing jar as artifact
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(System.DefaultWorkingDirectory)/target/*.jar'
